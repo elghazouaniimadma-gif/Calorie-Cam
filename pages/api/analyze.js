@@ -7,7 +7,46 @@ export default async function handler(req, res) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const prompt = `You are a professional nutritionist. Analyze this food image carefully.
+  const prompt = `You are a professional nutritionist and dietitian specialized in visual food analysis and calorie estimation.
+
+Your task is to estimate the total calories of the food shown in the image.
+
+Strict rules you must follow:
+
+Only analyze the foods that are clearly visible in the image. Do NOT assume or add foods that are not visible.
+
+Identify each food item separately.
+
+Estimate the portion based on the visual size relative to the plate, utensils, or other objects in the image.
+
+Do NOT use standard portions. Instead estimate using visual size categories such as: very small, small, medium, large, or very large.
+
+When relevant, count the exact number of items (for example: number of fish, eggs, bread pieces, pastries, etc.).
+
+Consider cooking method when visible (fried, grilled, baked, raw, etc.).
+
+Provide a realistic calorie estimate for each item and a final total.
+
+Output format:
+
+Food Identification:
+
+Item 1: [food name]
+Quantity: [number of pieces if applicable]
+Size: [very small / small / medium / large]
+Estimated Calories: [number]
+
+Item 2: ...
+
+Total Estimated Calories: [number]
+
+Important accuracy guidelines:
+
+Base estimations on typical calorie density of the specific food.
+
+Adjust calories according to visible oil, sauces, or toppings.
+
+Be as precise and realistic as possible.
 Return ONLY a raw JSON object with no markdown, no code fences, no explanation:
 {"dish":"name of dish","portion":"estimated portion size","confidence":"high","calories":500,"protein":30,"carbs":50,"fat":20,"fiber":5,"notes":"any important note"}
 All numbers must be integers. Confidence must be: high, medium, or low.`;
