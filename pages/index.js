@@ -95,7 +95,7 @@ export default function Home() {
                 ref={fileRef}
                 type="file"
                 accept="image/*"
-                capture="environment"
+                //capture="environment"
                 style={{ display: 'none' }}
                 onChange={(e) => handleFile(e.target.files[0])}
               />
