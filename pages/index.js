@@ -15,13 +15,32 @@ export default function Home() {
     setError(null);
 
     const reader = new FileReader();
-    reader.onerror = () => setError('Could not read image. Please try again.');
+    reader.onerror = () => setError('Could not read image.');
     reader.onload = (e) => {
       const dataUrl = e.target.result;
-      setImage(dataUrl);
-      // Extract base64 part after the comma
-      const base64 = dataUrl.substring(dataUrl.indexOf(',') + 1);
-      setImageBase64(base64);
+      // Compress using canvas
+      const img = new window.Image();
+      img.onload = () => {
+        const MAX = 800;
+        let w = img.width;
+        let h = img.height;
+        if (w > h && w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        else if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.8);
+        setImage(compressed);
+        setImageBase64(compressed.split(',')[1]);
+      };
+      img.onerror = () => {
+        // fallback: use original
+        setImage(dataUrl);
+        setImageBase64(dataUrl.split(',')[1]);
+      };
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   };
@@ -88,13 +107,9 @@ export default function Home() {
               <div style={s.uploadIcon}>🍽</div>
               <p style={s.uploadText}>Tap to photograph your dish</p>
               <p style={s.uploadHint}>Camera or photo library</p>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp,image/*"
+              <input ref={fileRef} type="file" accept="image/*"
                 style={{ display: 'none' }}
-                onChange={(e) => handleFile(e.target.files[0])}
-              />
+                onChange={(e) => handleFile(e.target.files[0])} />
             </div>
           ) : (
             <div style={s.previewWrap}>
